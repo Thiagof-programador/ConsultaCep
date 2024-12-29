@@ -1,7 +1,6 @@
 package com.example.consultacep
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -44,13 +43,15 @@ class MainActivity : AppCompatActivity() {
     private suspend fun recuperarEndereco(){
 
         var retorno: Response<Endereco>? = null
-        val cepDigitadoUsuario = binding.EditCep.text.toString()
+        val cepDigitadoUsuario = binding.editCep.text.toString()
+
         try {
             val enderecoAPI = retrofit.create(EnderecoAPI::class.java)
             retorno = enderecoAPI.recuperarEndereco(cepDigitadoUsuario)
         }catch (e:Exception){
             e.printStackTrace()
-            Log.i("info_endereco","erro ao recuperar $e")
+            //Log.i("info_endereco","erro ao recuperar $e")
+            binding.textView.text = "erro ao recuperar $e"
         }
         if(retorno != null){
             if(retorno.isSuccessful){
@@ -58,11 +59,20 @@ class MainActivity : AppCompatActivity() {
                 val endereco = retorno.body()
                 val rua = endereco?.logradouro
                 val cidade = endereco?.localidade
-                Log.i("info_endereco","Endereco: $rua , $cidade")
+                val uf = endereco?.uf
+                val cepapi = endereco?.cep
+                //Log.i("info_endereco","Endereco: $rua , Cidade: $cidade $uf ,CEP: $cepapi")
+                binding.textView.text = "Endereco: $rua , Cidade: $cidade, Uf: $uf, CEP: $cepapi"
+            }else{
+                //Log.i("info_endereco","Cep não encontrado: $cepDigitadoUsuario")
+                binding.textView.text = "Cep não encontrado: $cepDigitadoUsuario"
             }
+            binding.editCep.setText("")
         }
 
 
 
     }
+
+
 }
