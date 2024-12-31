@@ -12,6 +12,7 @@ import com.example.consultacep.model.Endereco
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
@@ -51,7 +52,11 @@ class MainActivity : AppCompatActivity() {
         }catch (e:Exception){
             e.printStackTrace()
             //Log.i("info_endereco","erro ao recuperar $e")
-            binding.textView.text = "erro ao recuperar $e"
+            // só pode ser execultado na main pois esta usando CoroutineScope(Dispatchers.IO)
+            withContext(Dispatchers.Main){
+                binding.textView.text = "erro ao recuperar $e"
+            }
+
         }
         if(retorno != null){
             if(retorno.isSuccessful){
@@ -62,10 +67,14 @@ class MainActivity : AppCompatActivity() {
                 val uf = endereco?.uf
                 val cepapi = endereco?.cep
                 //Log.i("info_endereco","Endereco: $rua , Cidade: $cidade $uf ,CEP: $cepapi")
-                binding.textView.text = "Endereco: $rua , Cidade: $cidade, Uf: $uf, CEP: $cepapi"
+                withContext(Dispatchers.Main){
+                    binding.textView.text = "Endereco: $rua , Cidade: $cidade, Uf: $uf, CEP: $cepapi"
+                }
             }else{
                 //Log.i("info_endereco","Cep não encontrado: $cepDigitadoUsuario")
-                binding.textView.text = "Cep não encontrado: $cepDigitadoUsuario"
+                withContext(Dispatchers.Main){
+                    binding.textView.text = "Cep não encontrado: $cepDigitadoUsuario"
+                }
             }
             binding.editCep.setText("")
         }
